@@ -1,0 +1,40 @@
+name: Build KissAt IPA
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build archive
+        run: |
+          xcodebuild archive \
+            -project KissAt.xcodeproj \
+            -scheme KissAt \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath $RUNNER_TEMP/KissAt.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""
+
+      - name: Package IPA
+        run: |
+          mkdir -p $RUNNER_TEMP/Payload
+          cp -r $RUNNER_TEMP/KissAt.xcarchive/Products/Applications/KissAt.app $RUNNER_TEMP/Payload/
+          cd $RUNNER_TEMP && zip -r KissAt.ipa Payload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: KissAt-ipa
+          path: ${{ runner.temp }}/KissAt.ipa
