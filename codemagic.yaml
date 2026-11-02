@@ -1,0 +1,27 @@
+workflows:
+  ios-unsigned-build:
+    name: KissAt Unsigned Build
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      xcode: 16.0
+    scripts:
+      - name: Install XcodeGen
+        script: |
+          brew install xcodegen
+      - name: Generate Xcode project
+        script: |
+          xcodegen generate
+      - name: Build unsigned IPA
+        script: |
+          xcodebuild archive \
+            -project KissAt.xcodeproj \
+            -scheme KissAt \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath $CM_BUILD_DIR/KissAt.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""
+    artifacts:
+      - $CM_BUILD_DIR/KissAt.xcarchive/Products/Applications/*.app
