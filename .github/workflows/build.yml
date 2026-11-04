@@ -17,6 +17,12 @@ jobs:
         with:
           xcode-version: 'latest-stable'
 
+      - name: Download working AirliftFFI
+        run: |
+          rm -rf AirliftFFI.xcframework
+          git clone --depth 1 https://github.com/Mak5er/AirCard-iOS.git /tmp/AirCard
+          cp -R /tmp/AirCard/AirliftFFI.xcframework ./
+
       - name: Install XcodeGen
         run: brew install xcodegen
 
