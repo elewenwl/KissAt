@@ -17,25 +17,6 @@ jobs:
         with:
           xcode-version: 'latest-stable'
 
-     
-      - name: Install Rust targets
-        run: |
-          rustup target add aarch64-apple-ios aarch64-apple-ios-sim
-
-      - name: Build AirliftFFI.xcframework
-        run: |
-          cd rust-core
-          cargo build --release --target aarch64-apple-ios
-          cargo build --release --target aarch64-apple-ios-sim
-          cd ..
-          rm -rf AirliftFFI.xcframework
-          xcodebuild -create-xcframework \
-            -library rust-core/target/aarch64-apple-ios/release/libairlift_ffi.a \
-            -headers rust-core/include \
-            -library rust-core/target/aarch64-apple-ios-sim/release/libairlift_ffi.a \
-            -output AirliftFFI.xcframework
-      
-
       - name: Install XcodeGen
         run: brew install xcodegen
 
